@@ -26,7 +26,8 @@ function onGalleryImageClick(evt) {
 }
 
 function onPressEscapeBtn(evt) {
-  if (evt.code === 'Escape') {
+  const isLightboxVisible = instance.visible();
+  if (evt.code === 'Escape' && isLightboxVisible) {
     instance.close();
   }
 }
