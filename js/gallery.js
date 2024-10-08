@@ -21,9 +21,7 @@ function onGalleryImageClick(evt) {
   const imageSource = target.dataset.source;
   const imageDescription = target.alt;
 
-  const lightboxImg = instance.element().querySelector('img');
-  lightboxImg.src = imageSource;
-  lightboxImg.alt = imageDescription;
+  updateLightboxImage(imageSource, imageDescription);
   instance.show();
 }
 
@@ -42,6 +40,11 @@ function initializeLightbox() {
 
   instance = basicLightbox.create(basicLightboxMarkup, option);
   lightboxImg = instance.element().querySelector('img');
+}
+
+function updateLightboxImage(source, description) {
+  lightboxImg.src = source;
+  lightboxImg.alt = description;
 }
 
 function initializeGallery() {
