@@ -5,12 +5,12 @@ const refs = {
   gallery: document.querySelector('.gallery'),
 };
 
-let instance = null;
-let lightboxImg = null;
+let basicLightboxInstance = null;
+let galleryImage = null;
 
-refs.gallery.addEventListener('click', onGalleryImageClick);
+refs.gallery.addEventListener('click', handleGalleryImageClick);
 
-function onGalleryImageClick(evt) {
+function handleGalleryImageClick(evt) {
   evt.preventDefault();
   const { target } = evt;
 
@@ -18,40 +18,42 @@ function onGalleryImageClick(evt) {
     return;
   }
 
-  const imageSource = target.dataset.source;
-  const imageDescription = target.alt;
+  if (!basicLightboxInstance) {
+    const galleryImageMarkup = `<img class="js-galleryImage" src="" alt="" width="800" height="600">`;
+    basicLightboxInstance = createBasicLightboxInstance(galleryImageMarkup, handleEscapePress);
+    galleryImage = basicLightboxInstance.element().querySelector('.js-galleryImage');
+  }
 
-  updateLightboxImage(imageSource, imageDescription);
-  instance.show();
+  galleryImage.src = target.dataset.source;
+  galleryImage.alt = target.alt;
+
+  basicLightboxInstance.show();
 }
 
-function onPressEscapeBtn(evt) {
-  const isLightboxVisible = instance.visible();
-  if (evt.code === 'Escape' && isLightboxVisible) {
-    instance.close();
+function handleEscapePress(evt) {
+  console.log(evt.code);
+  if (evt.code === 'Escape') {
+    this.close();
   }
 }
 
-function initializeLightbox() {
-  const basicLightboxMarkup = '<img src="" alt="" width="800" height="600">';
+function createBasicLightboxInstance(markup, onEscape) {
   const option = {
-    onShow: () => document.addEventListener('keydown', onPressEscapeBtn),
-    onClose: () => document.removeEventListener('keydown', onPressEscapeBtn),
+    handler: null,
+    onShow(instance) {
+      this.handler = onEscape.bind(instance);
+      document.addEventListener('keydown', this.handler);
+    },
+    onClose() {
+      document.removeEventListener('keydown', this.handler);
+    },
   };
 
-  instance = basicLightbox.create(basicLightboxMarkup, option);
-  lightboxImg = instance.element().querySelector('img');
+  return basicLightbox.create(markup, option);
 }
 
-function updateLightboxImage(source, description) {
-  lightboxImg.src = source;
-  lightboxImg.alt = description;
-}
-
-function initializeGallery() {
-  const galleryMarkup = createGalleryMarkup(images);
-
-  refs.gallery.innerHTML = galleryMarkup;
+function initializeGallery(images) {
+  refs.gallery.innerHTML = createGalleryMarkup(images);
 }
 
 function createGalleryMarkup(images) {
@@ -73,5 +75,4 @@ function createGalleryMarkup(images) {
     .join('');
 }
 
-initializeLightbox();
-initializeGallery();
+initializeGallery(images);
